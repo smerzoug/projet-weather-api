@@ -1,0 +1,12 @@
+$kind: collection
+description: PostAir Weather API
+variables:
+  baseUrl: /
+auth:
+  - id: 20fd7168-a2d1-40b8-9768-dec38c021cbe
+    type: apikey
+    name: apikey auth
+    credentials:
+      key: x-api-key
+      value: "{{apiKey}}"
+      in: header
