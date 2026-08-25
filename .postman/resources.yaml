@@ -1,0 +1,3 @@
+resourceNameMappings:
+  specs:
+    - ../postman/specs/PostAir Weather API/postair-openapi-3_1.json: PostAir Weather API
