@@ -1,30 +1,33 @@
 $kind: http-request
+name: Retrieve METAR report
 description: Returns a list of METAR reports
-url: "{{baseUrl}}/metars?airportCode=ATL"
+url: "{{baseUrl}}/metars"
 method: GET
 headers:
   Accept: application/json
+  x-api-key: "1234"
 queryParams:
   - key: airportCode
     value: ATL
-    disabled: false
-    description: airport code
-    $type: |-
-      {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string",
-            "default": "ATL",
-            "minLength": 3,
-            "maxLength": 4,
-            "pattern": "^[A-Z]{3,4}$"
-          }
-        }
-      }
+    disabled: true
+    description: ""
 body:
   type: text
   content: ""
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Vérifier le status 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"Response time is less than 200ms\", function () {\r
+
+      \    pm.expect(pm.response.responseTime).to.be.below(200);\r
+
+      });"
+    language: text/javascript
 settings: {}
 examples: ./.resources/Retrieve METAR report.resources/examples
 order: 1000
