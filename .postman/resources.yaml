@@ -1,3 +1,5 @@
 resourceNameMappings:
   specs:
     - ../postman/specs/PostAir Weather API/postair-openapi-3_1.json: PostAir Weather API
+workspace:
+  id: 39c9f826-583d-4322-b18c-cd3b88b541d1

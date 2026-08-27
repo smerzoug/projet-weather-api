@@ -1,30 +1,85 @@
 $kind: http-request
+name: Retrieve METAR report
 description: Returns a list of METAR reports
-url: "{{baseUrl}}/metars?airportCode=ATL"
+url: "{{baseUrl}}/metars"
 method: GET
 headers:
   Accept: application/json
+  x-api-key: "1234"
 queryParams:
   - key: airportCode
     value: ATL
-    disabled: false
-    description: airport code
-    $type: |-
-      {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "string",
-            "default": "ATL",
-            "minLength": 3,
-            "maxLength": 4,
-            "pattern": "^[A-Z]{3,4}$"
-          }
-        }
-      }
+    disabled: true
+    description: ""
 body:
   type: text
   content: ""
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Vérifier le status 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"Response time is less than 200ms\", function () {\r
+
+      \    pm.expect(pm.response.responseTime).to.be.below(200);\r
+
+      });\r
+
+      \r
+
+      // 1. Déclaration unique en début de script (portée globale au script)\r
+
+      const jsonData = pm.response.json();\r
+
+      // EPONSE DANS LE CAS OU KEY N'EST PAS VALIDE \r
+
+      pm.test(\"Test 1: verifier le code Unauthorized 401\",function(){\r
+
+      \    pm.response.to.have.status(401);\r
+
+      });\r
+
+      // TEST 2. Vérifier la structure JSON du message d'erreur\r
+
+      \r
+
+      pm.test(\"Test 2 : La réponse est un JSON valide et contient la propriété 'detail'\", function () {\r
+
+      \    // 1. Vérifie l'en-tête Content-Type\r
+
+      \    pm.response.to.have.header(\"Content-Type\");\r
+
+      \    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"json\");\r
+
+      });    \r
+
+      //TEST 3: VERIFIER  LE TITRE  DE LA REPONSE\r
+
+      pm.test(\"Test 3: Le type de la réponse est correct\", function () {\r
+
+      \     // var jsonData=pm.response.json()\r
+
+      \    pm.expect(jsonData.title).to.eql(\"Unauthorized\")\r
+
+      \r
+
+      });\r
+
+      \r
+
+      // TEST 4 : VERIFIER LE DETAIL DE LA REPONSE \r
+
+      pm.test(\"Test 4: Le détail de la réponse est correct\", function () {\r
+
+      \   // var jsonData=pm.response.json()\r
+
+      \    pm.expect(jsonData.detail).to.eql(\"Invalid API key\")\r
+
+      });"
+    language: text/javascript
 settings: {}
-examples: ./.resources/Retrieve METAR report.resources/examples
+examples: .resources/Retrieve METAR report.resources/examples
 order: 1000
