@@ -28,7 +28,7 @@ response:
         "type": "https://en.wikipedia.org/wiki/HTTP_401",
         "title": "Unauthorized",
         "status": 401,
-        "detail": "Invalid or missing authentication credentials",
+        "detail": "Invalid API key",
         "instance": "urn:api:request:example-401",
         "correlationId": "example-correlation-id"
       }
