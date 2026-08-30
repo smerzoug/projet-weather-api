@@ -1,4 +1,5 @@
 $kind: http-request
+name: Retrieve airport codes
 description: Returns a list of airport codes
 url: "{{baseUrl}}/airports?countryName=United States&airportCode=ATL"
 method: GET
@@ -45,6 +46,178 @@ auth:
     key: x-api-key
     value: "{{apiKey}}"
     in: header
+scripts:
+  - type: afterResponse
+    code: "/**\r
+
+      \ * Suite de tests d'intégration API - Happy Path (Cas Nominal)\r
+
+      \ * Framework : Postman / Chai BDD\r
+
+      \ */\r
+
+      \r
+
+      // -----------------------------------------------------------------------------\r
+
+      // 1. INITIALISATION DES DONNÉES COMMUNES (Portée globale du script)\r
+
+      // -----------------------------------------------------------------------------\r
+
+      const jsonData = pm.response.json();\r
+
+      \r
+
+      // Normalisation : Gère à la fois un objet simple {} ou une liste de résultats [{}]\r
+
+      const target = Array.isArray(jsonData) ? jsonData[0] : jsonData;\r
+
+      \r
+
+      \r
+
+      // -----------------------------------------------------------------------------\r
+
+      // 2. VÉRIFICATIONS RÉSEAU & EN-TÊTES (SLA & PROTOCOLE)\r
+
+      // -----------------------------------------------------------------------------\r
+
+      \r
+
+      // Test 1 : Validation du code de statut HTTP\r
+
+      pm.test(\"Statut HTTP - La réponse renvoie un code 200 OK\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      // Test 2 : Validation du format de contenu\r
+
+      pm.test(\"En-têtes - Le Content-Type est au format application/json\", function () {\r
+
+      \    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r
+
+      });\r
+
+      \r
+
+      // Test 3 : Validation du temps de réponse (SLA)\r
+
+      pm.test(\"Performance - Le temps de réponse est inférieur à 200 ms\", function () {\r
+
+      \    pm.expect(pm.response.responseTime).to.be.below(200);\r
+
+      });\r
+
+      \r
+
+      \r
+
+      // -----------------------------------------------------------------------------\r
+
+      // 3. VÉRIFICATION DU SCHÉMA & STRUCTURE DES DONNÉES\r
+
+      // -----------------------------------------------------------------------------\r
+
+      \r
+
+      // Test 4 : Présence des clés principales au niveau racine\r
+
+      pm.test(\"Schéma JSON - Les attributs 'country' et 'airports' sont présents\", function () {\r
+
+      \    pm.expect(target).to.have.property('country');\r
+
+      \    pm.expect(target).to.have.property('airports');\r
+
+      });\r
+
+      \r
+
+      // Test 5 : Structure et types des objets dans le tableau 'airports'\r
+
+      pm.test(\"Schéma JSON - Tous les aéroports contiennent les attributs et types requis\", function () {\r
+
+      \    target.airports.forEach(function (airport) {\r
+
+      \        // Présence des propriétés\r
+
+      \        pm.expect(airport).to.have.property('code');\r
+
+      \        pm.expect(airport).to.have.property('city');          \r
+
+      \        pm.expect(airport).to.have.property('name');\r
+
+      \        pm.expect(airport).to.have.property('latitude');   \r
+
+      \        pm.expect(airport).to.have.property('longitude');\r
+
+      \r
+
+      \        // Validation des types de données\r
+
+      \        pm.expect(airport.code).to.be.a('string');\r
+
+      \        pm.expect(airport.city).to.be.a('string');\r
+
+      \        pm.expect(airport.name).to.be.a('string');\r
+
+      \        pm.expect(airport.latitude).to.be.a('number');\r
+
+      \        pm.expect(airport.longitude).to.be.a('number');\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      \r
+
+      // -----------------------------------------------------------------------------\r
+
+      // 4. VÉRIFICATION DE L'INTÉGRITÉ DES DONNÉES (VALEURS MÉTIER)\r
+
+      // -----------------------------------------------------------------------------\r
+
+      \r
+
+      // Test 6 : Validation du nom du pays\r
+
+      pm.test(\"Données Métier - Le nom du pays est correct ('United States')\", function () {\r
+
+      \    pm.expect(target.country).to.equal(\"United States\");\r
+
+      });\r
+
+      \r
+
+      // Test 7 : Validation des informations détaillées de l'aéroport ciblé (ATL)\r
+
+      pm.test(\"Données Métier - Les coordonnées et détails de l'aéroport ATL sont exacts\", function () {\r
+
+      \    // Recherche dynamique de l'aéroport ATL dans le tableau\r
+
+      \    const atlAirport = target.airports.find(a => a.code === \"ATL\");\r
+
+      \r
+
+      \    // Assertion sur l'existence puis sur les valeurs exactes\r
+
+      \    pm.expect(atlAirport, \"L'aéroport avec le code ATL doit exister\").to.not.be.undefined;\r
+
+      \    pm.expect(atlAirport.city).to.equal(\"Atlanta\");\r
+
+      \    pm.expect(atlAirport.name).to.equal(\"Hartsfield-Jackson Atlanta International Airport\");\r
+
+      \    pm.expect(atlAirport.latitude).to.equal(33.6407);\r
+
+      \    pm.expect(atlAirport.longitude).to.equal(-84.4277);\r
+
+      });"
+    language: text/javascript
 settings: {}
 examples: ./.resources/Retrieve airport codes.resources/examples
 order: 1000
