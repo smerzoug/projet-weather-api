@@ -5,7 +5,7 @@ url: "{{baseUrl}}/metars"
 method: GET
 headers:
   Accept: application/json
-  x-api-key: "1234"
+  x-api-key: "123"
 queryParams:
   - key: airportCode
     value: ATL
